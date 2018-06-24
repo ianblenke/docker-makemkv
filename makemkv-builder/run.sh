@@ -1,5 +1,5 @@
-#!/bin/sh
-SCRIPT_DIR="$(readlink -f "$(dirname "$0")")"
+#!/bin/bash
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 BUILDER_DOCKER_IMAGE="ubuntu:xenial"
 
 exec docker run --rm \

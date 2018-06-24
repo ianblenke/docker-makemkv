@@ -1,0 +1,16 @@
+version: '2.1'
+
+#volumes:
+#
+#  makemkv-builder:
+#    driver: local
+
+services:
+
+  makemkv-builder:
+    build: .
+    image: ubuntu:xenial
+    container_name: makemkv-builder
+    volumes:
+#      - makemkv-builder:/output
+      - ./output:/output

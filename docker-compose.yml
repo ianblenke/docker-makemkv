@@ -1,0 +1,27 @@
+version: '2.1'
+
+volumes:
+
+  makemkv-config:
+    driver: local
+  makemkv-storage:
+    driver: local
+  makemkv-output:
+    driver: local
+
+services:
+
+  makemkv:
+    build: .
+    image: ianblenke/makemkv
+    container_name: makemkv
+    ports:
+      - 5800:5800
+    volumes:
+      - makemkv-config:/config
+      - makemkv-storage:/storage
+      - makemkv-output:/output
+    devices:
+      - /dev/sr0
+      - /dev/sg1
+
