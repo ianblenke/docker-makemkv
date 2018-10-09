@@ -7,8 +7,8 @@ export DEBIAN_FRONTEND=noninteractive
 
 SCRIPT_DIR="$(dirname "${BASH_SOURCE[0]}")"
 
-MAKEMKV_VERSION=1.12.2
-FFMPEG_VERSION=4.0
+MAKEMKV_VERSION=1.12.3
+FFMPEG_VERSION=2.8.14
 FDK_AAC_VERSION=0.1.6
 
 MAKEMKV_OSS_URL=http://www.makemkv.com/download/makemkv-oss-${MAKEMKV_VERSION}.tar.gz
@@ -106,7 +106,7 @@ echo "Downloading MakeMKV OSS..."
 curl -# -L ${MAKEMKV_OSS_URL} | tar -xz
 echo "Compiling MakeMKV OSS..."
 cd makemkv-oss-${MAKEMKV_VERSION}
-patch -p1 < "$SCRIPT_DIR/makemkv-ffmpeg.patch"
+patch -p0 < "$SCRIPT_DIR/launch-url.patch"
 DESTDIR="$INSTALL_DIR" PKG_CONFIG_PATH="$BUILD_DIR/ffmpeg/lib/pkgconfig" ./configure --prefix=
 make install
 

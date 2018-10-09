@@ -22,7 +22,7 @@ multiple video/audio tracks with all meta-information and preserve chapters.
     <url>http://www.makemkv.com/</url>
   </project>
   <unraid>
-    <support_url>https://forums.lime-technology.com/topic/58352-support-makemkv/</support_url>
+    <support_url>https://forums.unraid.net/topic/58352-support-makemkv/</support_url>
     <category>MediaApp:Video</category>
     <extra_description>
 [span style='color: red;'][b]NOTE:[/b][/span] For the container to have
@@ -99,6 +99,9 @@ To enable the automatic disc ripper, set the environment variable
 To eject the disc from the drive when ripping is terminated, set the environment
 variable `AUTO_DISC_RIPPER_EJECT` to `1`.
 
+If multiple drives are available, discs can be ripped simultaneously by
+setting the environment variable `AUTO_DISC_RIPPER_PARALLEL_RIP` to `1`.
+
 See the [Environment Variables](#environment-variables) section for details
 about setting environment variables.
 
@@ -133,6 +136,38 @@ section for more details.
   </documentation>
   <!-- Changelog of the application. -->
   <history>
+      <release>
+        <version>1.9.4</version>
+        <date>2018-10-02</date>
+        <change>Fixed issue where files and folders created for the backup of a Blu-Ray disc would not follow the configured umask.</change>
+        <change>The auto disc ripper now drops root privileges at start.</change>
+        <change>Added the `AUTO_DISC_RIPPER_FORCE_UNIQUE_DIR` environment variable to better support workflows involving video discs with the same label.</change>
+        <change>Instead of silently failing to open an URL, a pop-up window is now displayed when certain menu items are selected.</change>
+      </release>
+      <release>
+        <version>1.9.3</version>
+        <date>2018-09-18</date>
+        <change>Now using baseimage v3.5.1, which brings the following changes:</change>
+        <change level="2">Updated installed packages to get latest security fixes.</change>
+        <change>During container startup, make sure the MakeMKV data directory is set to the correct value.</change>
+      </release>
+      <release>
+        <version>1.9.2</version>
+        <date>2018-08-20</date>
+        <change>Fixed an issue where fetching the beta key would fail.</change>
+      </release>
+      <release>
+        <version>1.9.1</version>
+        <date>2018-07-27</date>
+        <change>Upgraded MakeMKV to version 1.12.3.</change>
+        <change>Reverted FFmpeg to version 2.8.14.</change>
+      </release>
+      <release>
+        <version>1.9.0</version>
+        <date>2018-07-18</date>
+        <change>Auto disc ripper: Added support for parallel discs ripping.</change>
+        <change>Now using baseimage v3.4.0, which is based on Alpine Linux 3.8.</change>
+      </release>
       <release>
         <version>1.8.0</version>
         <date>2018-04-28</date>
@@ -348,6 +383,18 @@ section for more details.
       </unraid_template>
     </environment_variable>
     <environment_variable>
+      <name>AUTO_DISC_RIPPER_PARALLEL_RIP</name>
+      <description>When set to `1`, discs from all available optical drives are ripped in parallel.  Else, each disc from optical drives is ripped one at time.</description>
+      <default>0</default>
+      <unraid_template>
+        <title>Automatic Disc Ripper: Parallel</title>
+        <description>When set to 1, discs from all available optical drives are ripped in parallel.  Else, each disc from optical drives is ripped one at time.</description>
+        <display>always</display>
+        <required>false</required>
+        <mask>false</mask>
+      </unraid_template>
+    </environment_variable>
+    <environment_variable>
       <name>AUTO_DISC_RIPPER_INTERVAL</name>
       <description>Interval, in seconds, the automatic disc ripper checks for the presence of a DVD/Blu-ray discs.</description>
       <default>5</default>
@@ -381,6 +428,18 @@ section for more details.
         <mask>false</mask>
       </unraid_template>
     </environment_variable>
+    <environment_variable>
+      <name>AUTO_DISC_RIPPER_FORCE_UNIQUE_OUTPUT_DIR</name>
+      <description>When set to `0`, files are written to `/output/DISC_LABEL/`, where `DISC_LABEL` is the label/name of the disc.  If this directory exists, then files are written to `/output/DISC_LABEL-XXXXXX`, where `XXXXXX` are random readable characters.  When set to `1`, the `/output/DISC_LABEL-XXXXXX` pattern is always used.</description>
+      <default>0</default>
+      <unraid_template>
+        <title>Automatic Disc Ripper: Force Unique Output Directory</title>
+        <description>When set to [b][i]0[/b][/i], files are written to [i]/output/DISC_LABEL/[/i], where [i]DISC_LABEL[/i] is the label/name of the disc.  If this directory exists, then files are written to [i]/output/DISC_LABEL-XXXXXX[/i], where [i]XXXXXX[/i] are random readable characters.  When set to [b][i]1[/b][/i], the [i]/output/DISC_LABEL-XXXXXX[/i] pattern is always used.</description>
+        <display>always</display>
+        <required>false</required>
+        <mask>false</mask>
+      </unraid_template>
+    </environment_variable>
     </environment_variables>
     <!-- Volumes -->
     <volumes>
@@ -408,7 +467,7 @@ section for more details.
       <mandatory>false</mandatory>
       <unraid_template>
         <title>Streaming Port</title>
-        <description>Port used by the streaming service.  This can be removed is the feature is not used.</description>
+        <description>Port used by the streaming service.  This can be removed if the feature is not used.</description>
         <display>advanced</display>
         <required>false</required>
         <mask>false</mask>

@@ -3,9 +3,15 @@
 set -e # Exit immediately if a command exits with a non-zero status.
 set -u # Treat unset variables as an error.
 
+log() {
+    echo "[cont-init.d] $(basename $0): $*"
+}
+
 # Generate machine id
-echo "Generating machine-id..."
-cat /proc/sys/kernel/random/uuid | tr -d '-' > /etc/machine-id
+if [ ! -f /etc/machine-id ]; then
+    log "generating machine-id..."
+    cat /proc/sys/kernel/random/uuid | tr -d '-' > /etc/machine-id
+fi
 
 mkdir -p "$XDG_CONFIG_HOME"
 
@@ -24,6 +30,9 @@ fi
 # Copy default config if needed.
 [ -f /config/settings.conf ] || cp -v /defaults/settings.conf /config/
 [ -f "$XDG_CONFIG_HOME/QtProject.conf" ] || cp -v /defaults/QtProject.conf "$XDG_CONFIG_HOME/"
+
+# Make sure the data directory is correctly set.
+sed -i 's|app_DataDir = .*|app_DataDir = "/config/data"|' /config/settings.conf
 
 # Create link for MakeMKV config directory.
 # The only configuration location MakeMKV looks for seems to be
@@ -54,7 +63,7 @@ case  "${MAKEMKV_KEY:-UNSET}" in
 esac
 
 # Take ownership of the config directory content.
-chown -R $USER_ID:$GROUP_ID /config/*
+find /config -mindepth 1 -exec chown $USER_ID:$GROUP_ID {} \;
 
 # Take ownership of the output directory.
 if ! chown $USER_ID:$GROUP_ID /output; then
@@ -67,4 +76,4 @@ if ! chown $USER_ID:$GROUP_ID /output; then
     fi
 fi
 
-# vim: set ft=sh :
+# vim:ft=sh:ts=4:sw=4:et:sts=4
