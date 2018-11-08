@@ -7,11 +7,42 @@
 # Pull base image.
 FROM jlesage/baseimage-gui:alpine-3.8-v3.5.1
 
+# Define software versions.
+ARG OPENJDK_VERSION=11.0.1
+
+# Define software download URLs.
+ARG OPENJDK_URL=https://download.java.net/java/GA/jdk11/13/GPL/openjdk-${OPENJDK_VERSION}_linux-x64_bin.tar.gz
+
 # Define working directory.
 WORKDIR /tmp
 
 # Install MakeMKV.
 ADD makemkv-builder/makemkv.tar.gz /
+
+# Install Java.
+RUN \
+    add-pkg --virtual build-dependencies \
+        curl \
+        binutils \
+        findutils \
+        && \
+    mkdir /usr/lib/jvm/ && \
+    # Download and extract.
+    curl -# -L "${OPENJDK_URL}" | tar xz -C /usr/lib/jvm/ && \
+    # Removed uneeded stuff.
+    rm -r \
+        /usr/lib/jvm/jdk-${OPENJDK_VERSION}/include \
+        /usr/lib/jvm/jdk-${OPENJDK_VERSION}/jmods \
+        /usr/lib/jvm/jdk-${OPENJDK_VERSION}/legal \
+        /usr/lib/jvm/jdk-${OPENJDK_VERSION}/release \
+        /usr/lib/jvm/jdk-${OPENJDK_VERSION}/lib/modules \
+        /usr/lib/jvm/jdk-${OPENJDK_VERSION}/lib/src.zip \
+        && \
+    # Strip.
+    find /usr/lib/jvm/jdk-${OPENJDK_VERSION} -type f -executable -or -name *.so -exec strip {} ';' && \
+    # Cleanup.
+    del-pkg build-dependencies && \
+    rm -rf /tmp/* /tmp/.[!.]*
 
 # Install dependencies.
 RUN \
@@ -20,7 +51,6 @@ RUN \
         sed \
         findutils \
         util-linux \
-        openjdk8-jre-base \
         lsscsi
 
 # Generate and install favicons.
