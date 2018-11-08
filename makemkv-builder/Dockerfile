@@ -4,5 +4,7 @@ ADD builder/ /builder/
 
 VOLUME /output
 
-CMD /builder/build.sh /output
+RUN /builder/build.sh /output
+
+CMD sleep 300
 
