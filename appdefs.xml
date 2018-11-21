@@ -137,6 +137,29 @@ section for more details.
   <!-- Changelog of the application. -->
   <history>
       <release>
+        <version>1.10.3</version>
+        <date>2018-11-13</date>
+        <change>Reduced the size of the Docker image.</change>
+      </release>
+      <release>
+        <version>1.10.2</version>
+        <date>2018-11-12</date>
+        <change>Fixed an issue where the automatic disc ripper would fail to start when `USER_ID` is set to `0`.</change>
+      </release>
+      <release>
+        <version>1.10.1</version>
+        <date>2018-11-09</date>
+        <change>Upgraded MakeMKV to version 1.14.1.</change>
+      </release>
+      <release>
+        <version>1.10.0</version>
+        <date>2018-11-08</date>
+        <change>Upgraded MakeMKV to version 1.14.0.</change>
+        <change>Upgraded FFmpeg to version 4.1.</change>
+        <change>Fixed Java invocation failure.</change>
+        <change>Small enhancements to the MakeMKV builder.</change>
+      </release>
+      <release>
         <version>1.9.5</version>
         <date>2018-10-26</date>
         <change>Updated OpenJDK to version 11.0.1.  This fixes an issue where MakeMKV would crash with certain BluRay discs.</change>
@@ -465,21 +488,7 @@ section for more details.
     </volume>
     </volumes>
     <!-- Network ports -->
-    <ports>
-    <port>
-      <number>51000</number>
-      <protocol>tcp</protocol>
-      <description>Port used by the streaming service.</description>
-      <mandatory>false</mandatory>
-      <unraid_template>
-        <title>Streaming Port</title>
-        <description>Port used by the streaming service.  This can be removed if the feature is not used.</description>
-        <display>advanced</display>
-        <required>false</required>
-        <mask>false</mask>
-      </unraid_template>
-    </port>
-    </ports>
+    <ports/>
     <!-- Devices -->
     <devices>
     <device>

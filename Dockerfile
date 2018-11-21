@@ -8,10 +8,10 @@
 FROM jlesage/baseimage-gui:alpine-3.8-v3.5.1
 
 # Define software versions.
-ARG OPENJDK_VERSION=11.0.1
+ARG OPENJDK_VERSION=12-ea+18
 
 # Define software download URLs.
-ARG OPENJDK_URL=https://download.java.net/java/GA/jdk11/13/GPL/openjdk-${OPENJDK_VERSION}_linux-x64_bin.tar.gz
+ARG OPENJDK_URL=https://download.java.net/java/early_access/alpine/18/binaries/openjdk-${OPENJDK_VERSION}_linux-x64-musl_bin.tar.gz
 
 # Define working directory.
 WORKDIR /tmp
@@ -23,23 +23,23 @@ ADD makemkv-builder/makemkv.tar.gz /
 RUN \
     add-pkg --virtual build-dependencies \
         curl \
-        binutils \
-        findutils \
         && \
-    mkdir /usr/lib/jvm/ && \
+    mkdir /tmp/jdk/ && \
     # Download and extract.
-    curl -# -L "${OPENJDK_URL}" | tar xz -C /usr/lib/jvm/ && \
+    curl -# -L "${OPENJDK_URL}" | tar xz --strip 1 -C /tmp/jdk && \
+    # Create a minimal Java install.
+    mkdir /usr/lib/jvm/ && \
+    /tmp/jdk/bin/jlink \
+        --compress=2 \
+        --module-path /tmp/jdk/jmods \
+        --add-modules "$(/tmp/jdk/bin/jdeps /opt/makemkv/share/MakeMKV/blues.jar | grep -v blues.jar | grep -v 'not found' | awk '{ print $4 }'| sort -u | tr '\n' ',')" \
+        --output /usr/lib/jvm/jdk \
+        && \
     # Removed uneeded stuff.
     rm -r \
-        /usr/lib/jvm/jdk-${OPENJDK_VERSION}/include \
-        /usr/lib/jvm/jdk-${OPENJDK_VERSION}/jmods \
-        /usr/lib/jvm/jdk-${OPENJDK_VERSION}/legal \
-        /usr/lib/jvm/jdk-${OPENJDK_VERSION}/release \
-        /usr/lib/jvm/jdk-${OPENJDK_VERSION}/lib/modules \
-        /usr/lib/jvm/jdk-${OPENJDK_VERSION}/lib/src.zip \
+        /usr/lib/jvm/jdk/include \
+        /usr/lib/jvm/jdk/legal \
         && \
-    # Strip.
-    find /usr/lib/jvm/jdk-${OPENJDK_VERSION} -type f -executable -or -name *.so -exec strip {} ';' && \
     # Cleanup.
     del-pkg build-dependencies && \
     rm -rf /tmp/* /tmp/.[!.]*
